@@ -7,15 +7,15 @@ import torch.nn.functional as F
 from overrides import overrides
 
 from allennlp.data import Vocabulary
-from allennlp.models.model import Model
-from allennlp.modules.token_embedders import Embedding
-from allennlp.modules import FeedForward
-from allennlp.modules import Seq2SeqEncoder, TimeDistributed, TextFieldEmbedder, SpanPruner
-from allennlp.modules.span_extractors import SelfAttentiveSpanExtractor, EndpointSpanExtractor
-from allennlp.nn import util, InitializerApplicator, RegularizerApplicator
-from allennlp.training.metrics import MentionRecall, ConllCorefScores
 from allennlp.models.coreference_resolution import CoreferenceResolver
-
+from allennlp.models.model import Model
+from allennlp.modules import (FeedForward, Seq2SeqEncoder, TextFieldEmbedder,
+                              TimeDistributed)
+from allennlp.modules.span_extractors import (EndpointSpanExtractor,
+                                              SelfAttentiveSpanExtractor)
+from allennlp.modules.token_embedders import Embedding
+from allennlp.nn import InitializerApplicator, RegularizerApplicator, util
+from allennlp.training.metrics import ConllCorefScores, MentionRecall
 from hmtl.training.metrics import ConllCorefFullScores
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
@@ -30,7 +30,7 @@ class CoreferenceCustom(CoreferenceResolver):
         and not only their average.
         2/ Give the possibility to evaluate with the gold mentions: the model first predict mentions that MIGHT
         be part of a coreference cluster, and in second time predict the coreference clusters for theses mentions.
-        We leave the possibility of replacing predicting the possible mentions 
+        We leave the possibility of replacing predicting the possible mentions
         with the gold mentions in evaluation.
     """
 
@@ -200,7 +200,7 @@ class CoreferenceCustom(CoreferenceResolver):
             # Compute labels.
             # Shape: (batch_size, num_spans_to_keep, max_antecedents + 1)
             gold_antecedent_labels = self._compute_antecedent_gold_labels(pruned_gold_labels, antecedent_labels)
-            coreference_log_probs = util.last_dim_log_softmax(coreference_scores, top_span_mask)
+            coreference_log_probs = util.masked_log_softmax(coreference_scores, top_span_mask)
             correct_antecedent_log_probs = coreference_log_probs + gold_antecedent_labels.log()
             negative_marginal_log_likelihood = -util.logsumexp(correct_antecedent_log_probs).sum()
 
