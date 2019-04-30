@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 class LayerNerEmdCoref(Model):
     """
     A class that implement three tasks of HMTL model: NER (CRF Tagger), EMD (CRF Tagger) and Coreference Resolution.
-    
+
     Parameters
     ----------
     vocab: ``allennlp.data.Vocabulary``, required.
@@ -64,7 +64,7 @@ class LayerNerEmdCoref(Model):
             text_field_embedder=self._text_field_embedder,
             encoder=self._encoder_ner,
             label_namespace=tagger_ner_params.pop("label_namespace", "labels"),
-            constraint_type=tagger_ner_params.pop("constraint_type", None),
+            label_encoding=tagger_ner_params.pop("label_encoding", None),
             dropout=tagger_ner_params.pop("dropout", None),
             regularizer=regularizer,
         )
@@ -92,7 +92,7 @@ class LayerNerEmdCoref(Model):
             text_field_embedder=self._shortcut_text_field_embedder,
             encoder=self._encoder_emd,
             label_namespace=tagger_emd_params.pop("label_namespace", "labels"),
-            constraint_type=tagger_emd_params.pop("constraint_type", None),
+            label_encoding=tagger_emd_params.pop("label_encoding", None),
             dropout=tagger_ner_params.pop("dropout", None),
             regularizer=regularizer,
         )

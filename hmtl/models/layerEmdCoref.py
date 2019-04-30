@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 class LayerEmdCoref(Model):
     """
     A class that implement two tasks of HMTL model: EMD (CRF Tagger) and Coref (Lee et al., 2017).
-    
+
     Parameters
     ----------
     vocab: ``allennlp.data.Vocabulary``, required.
@@ -64,7 +64,7 @@ class LayerEmdCoref(Model):
             text_field_embedder=self._text_field_embedder,
             encoder=self._encoder_emd,
             label_namespace=tagger_emd_params.pop("label_namespace", "labels"),
-            constraint_type=tagger_emd_params.pop("constraint_type", None),
+            label_encoding=tagger_emd_params.pop("label_encoding", None),
             dropout=tagger_emd_params.pop("dropout", None),
             regularizer=regularizer,
         )
