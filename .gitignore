@@ -5,6 +5,7 @@
 *.pyo
 
 __pycache__/
+.mypy_cache/
 
 data/*
 serialization_dirs/
