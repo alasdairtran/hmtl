@@ -1,32 +1,30 @@
 # coding: utf-8
 
-import os
+import itertools
+import logging
 import math
+import os
+import random
+import shutil
 import time
 from copy import deepcopy
-import random
-import logging
-import itertools
-import shutil
-from tensorboardX import SummaryWriter
-
-from typing import List, Optional, Dict, Any, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import torch
 import torch.optim.lr_scheduler
 import tqdm
+from tensorboardX import SummaryWriter
 
 from allennlp.common import Params
 from allennlp.common.checks import ConfigurationError, check_for_gpu
-from allennlp.common.util import peak_memory_mb, gpu_memory_mb
+from allennlp.common.registrable import Registrable
+from allennlp.common.util import gpu_memory_mb, peak_memory_mb
+from allennlp.models.model import Model
 from allennlp.nn.util import device_mapping, move_to_device
 from allennlp.training.learning_rate_schedulers import LearningRateScheduler
 from allennlp.training.optimizers import Optimizer
-from allennlp.training.trainer import sparse_clip_norm, TensorboardWriter
-from allennlp.models.model import Model
-from allennlp.common.registrable import Registrable
-
-
+from allennlp.training.tensorboard_writer import TensorboardWriter
+from allennlp.training.util import sparse_clip_norm
 from hmtl.tasks import Task
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
@@ -51,7 +49,7 @@ class MultiTaskTrainer(Registrable):
         log_parameter_statistics: bool = False,
         log_gradient_statistics: bool = False,
     ):
-        """ 
+        """
         Parameters
         ----------
         model: ``Model``, required.
@@ -145,7 +143,7 @@ class MultiTaskTrainer(Registrable):
         Given a task, the history of the performance on that task,
         and the current score, check if current score is
         best so far and if out of patience.
-        
+
         Parameters
         ----------
         metric_history: List[float], required
@@ -153,7 +151,7 @@ class MultiTaskTrainer(Registrable):
         should_decrease: bool, default = False
             Wheter or not the validation metric should increase while training.
             For instance, the bigger the f1 score is, the better it is -> should_decrease = False
-            
+
         Returns
         -------
         best_so_far: bool
@@ -229,7 +227,7 @@ class MultiTaskTrainer(Registrable):
     def _save_checkpoint(self, epoch: int, should_stop: bool) -> None:
         """
         Save the current states (model, training, optimizers, metrics and tasks).
-        
+
         Parameters
         ----------
         epoch: int, required.
@@ -297,7 +295,7 @@ class MultiTaskTrainer(Registrable):
         """
         Restores a model from a serialization_dir to the last saved checkpoint.
         This includes an epoch count, optimizer state, a model state, a task state and
-        a metric state. All are of which are serialized separately. 
+        a metric state. All are of which are serialized separately.
         This function should only be used to continue training -
         if you wish to load a model for inference/load parts of a model into a new
         computation graph, you should use the native Pytorch functions:
@@ -305,7 +303,7 @@ class MultiTaskTrainer(Registrable):
 
         Returns
         -------
-        epoch: int, 
+        epoch: int,
             The epoch at which to resume training.
         should_stop: bool
             Whether or not the training should already by stopped.

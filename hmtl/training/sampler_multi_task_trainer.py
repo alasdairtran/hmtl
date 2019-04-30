@@ -2,37 +2,35 @@
 
 # A modified version of the trainer showcased in GLUE: https://github.com/nyu-mll/GLUE-baselines
 
-import os
+import itertools
+import logging
 import math
+import os
+import random
+import shutil
 import time
 from copy import deepcopy
-import random
-import logging
-import itertools
-import shutil
-from tensorboardX import SummaryWriter
+from typing import Any, Dict, List, Optional
+
 import numpy as np
-
-from typing import List, Optional, Dict, Any
-from overrides import overrides
-
 import torch
 import torch.optim.lr_scheduler
 import tqdm
+from overrides import overrides
+from tensorboardX import SummaryWriter
 
 from allennlp.common import Params
 from allennlp.common.checks import ConfigurationError, check_for_gpu
-from allennlp.common.util import peak_memory_mb, gpu_memory_mb
-from allennlp.nn.util import device_mapping
+from allennlp.common.util import gpu_memory_mb, peak_memory_mb
 from allennlp.data.iterators import DataIterator
+from allennlp.models.model import Model
+from allennlp.nn.util import device_mapping
 from allennlp.training.learning_rate_schedulers import LearningRateScheduler
 from allennlp.training.optimizers import Optimizer
-from allennlp.training.trainer import sparse_clip_norm, TensorboardWriter
-from allennlp.models.model import Model
-
+from allennlp.training.tensorboard_writer import TensorboardWriter
+from allennlp.training.util import sparse_clip_norm
 from hmtl.tasks import Task
 from hmtl.training.multi_task_trainer import MultiTaskTrainer
-
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -86,9 +84,9 @@ class SamplerMultiTaskTrainer(MultiTaskTrainer):
         """
         Train the different task_list, save the different checkpoints and metrics,
         and save the model at the end of training while logging the training details.
-        
+
         The metrics through the training are stored in dictionaries with the following structure:
-        
+
         all_metrics - Dict[str, str]
             task_name: val_metric
 
@@ -97,18 +95,18 @@ class SamplerMultiTaskTrainer(MultiTaskTrainer):
                 val_metric (str): name (str)
                 hist (str): history_of_the_val_metric (List[float])
                 stopped (str): training_is_stopped (bool)
-                best (str): best_epoch_for_val_metric (Tuple(int, Dict))  
+                best (str): best_epoch_for_val_metric (Tuple(int, Dict))
 
         all_tr_metrics (Dict[str, Dict[str, float]])
             task_name (Dict[str, float])
                 metric_name (str): value (float)
-                loss: value (float)		
+                loss: value (float)
 
         all_val_metrics (Dict[str, Dict[str, float]])
             task_name (Dict[str, float])
                 metric_name (str): value (float)
                 loss (str): value (float)
-        
+
         Parameters
         ----------
         task_list: List[Task], required
