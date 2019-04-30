@@ -2,14 +2,12 @@
 
 from typing import List
 
-from overrides import overrides
 import torch
-from torch.nn import Dropout, Linear
-from torch.nn import GRU
+from overrides import overrides
+from torch.nn import GRU, Dropout, Linear
 
-from allennlp.nn.util import last_dim_softmax, weighted_sum
-from allennlp.modules.seq2seq_encoders.seq2seq_encoder import Seq2SeqEncoder
 from allennlp.common.params import Params
+from allennlp.modules.seq2seq_encoders.seq2seq_encoder import Seq2SeqEncoder
 
 
 @Seq2SeqEncoder.register("stacked_gru")
