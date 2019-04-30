@@ -1,17 +1,18 @@
 # coding: utf-8
 
 from typing import List
+
 from allennlp.common import Params
-from allennlp.commands.train import datasets_from_params
-from allennlp.data.iterators import DataIterator
 from allennlp.common.checks import ConfigurationError
+from allennlp.data.iterators import DataIterator
+from allennlp.training.util import datasets_from_params
 
 
 class Task:
     """
     A class to encapsulate the necessary informations (and datasets)
     about each task.
-    
+
     Parameters
     ----------
     name : ``str``, required
